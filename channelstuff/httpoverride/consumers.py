@@ -1,16 +1,27 @@
 from django.http import HttpResponse
 from channels.handler import AsgiHandler
+from channels import Group
+
+# Connected to websocket.connect
+def ws_add(message):
+    message.reply_channel.send({"accept": True})
+    Group("chat").add(message.reply_channel)
 
 def ws_message(message):
     # ASGI WebSocket packet-received and send-packet message types
     # both have a "text" key for their textual data.
-    message.reply_channel.send({
-        "text": message.content['text'],
+    Group("chat").send({
+        "text": "[user] %s" % message.content['text'],
     })
+
+# Connected to websocket.disconnect
+def ws_disconnect(message):
+    Group("chat").discard(message.reply_channel)
+
 
 """
 The following JS was entered into the console to create
-a websocket and connect.
+a websocket, connect, sent a message.
 
 
 // Note that the path doesn't matter for routing; any WebSocket
