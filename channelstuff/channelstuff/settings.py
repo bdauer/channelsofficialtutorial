@@ -43,8 +43,11 @@ INSTALLED_APPS = [
 
 CHANNEL_LAYERS = {
     "default": {
-        # inmemory WILL NOT WORK IN PRODUCTION
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
+        # make sure redis is installed ans a server is running.
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
         "ROUTING": "httpoverride.routing.channel_routing",
     }
 }
